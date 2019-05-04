@@ -1,0 +1,103 @@
+# BASIC AUTH
+proxy:
+  ### PERSONALIZATION ###
+  title: "${USER}'s ShinyStudio"
+  hide-navbar: false
+  logo-url: file:///opt/shinyproxy/templates/grid-layout/assets/img/shinystudio.png
+  favicon-path: /opt/shinyproxy/templates/grid-layout/assets/img/shinystudio.png
+  template-path: ./templates/grid-layout
+  ### AUTHENTICATION ###
+  authentication: simple
+  users:
+  - name: ${USER}
+    password: changeme
+    groups: admin
+  admin-groups: admin
+  ### DANGER ZONE ###
+  port: 8080 # don't change!
+  landing-page: /
+  heartbeat-rate: 15000
+  heartbeat-timeout: 120000
+  docker:
+    internal-networking: true
+  specs:
+    - id: reports
+      display-name: Apps & Reports
+      logo-url: 'fas fa-chart-line'
+      container-image: shinystudio_rstudio_rshiny_vscode
+      container-cmd: ["/start.sh", "shiny-server"]
+      container-network: shinystudio-net
+      container-volumes:
+        - "${MOUNTPOINT}/content/sites/${DESTSITE}/_apps:/srv/shiny-server:z"
+        # - "${MOUNTPOINT}/logs/${DESTSITE}/${USER}:/var/log/shiny-server:z"
+        - 'shinystudio_r_libraries:/r-libs'
+        - 'shinystudio_py_environment:/pyenv'
+        - 'shinystudio_pwsh_modules:/home/${USER}/.local/share/powershell/Modules'
+      container-env:
+        USER: "${USER}"
+        USERID: ${USERID}
+    - id: documents
+      display-name: Documents
+      logo-url: 'fas fa-file-alt'
+      container-image: shinystudio_rstudio_rshiny_vscode
+      container-cmd: ["/start.sh", "shiny-server"]
+      container-network: shinystudio-net
+      container-volumes:
+        - "${MOUNTPOINT}/content/sites/${DESTSITE}/_docs:/srv/shiny-server:z"
+        # - "${MOUNTPOINT}/logs/${DESTSITE}/${USER}:/var/log/shiny-server:z"
+        - 'shinystudio_r_libraries:/r-libs'
+        - 'shinystudio_py_environment:/pyenv'
+        - 'shinystudio_pwsh_modules:/home/${USER}/.local/share/powershell/Modules'
+      container-env:
+        USER: "${USER}"
+        USERID: ${USERID}
+    - id: personal
+      display-name: Personal
+      logo-url: 'far fa-folder-open'
+      container-image: shinystudio_rstudio_rshiny_vscode
+      container-cmd: ["/start.sh", "shiny-server"]
+      container-network: shinystudio-net
+      container-volumes:
+        - "${MOUNTPOINT}/content/users/${USER}:/srv/shiny-server:z"
+        - 'shinystudio_r_libraries:/r-libs'
+        - 'shinystudio_py_environment:/pyenv'
+        - 'shinystudio_pwsh_modules:/home/${USER}/.local/share/powershell/Modules'
+      container-env:
+        USER: "${USER}"
+        USERID: ${USERID}
+    - id: rstudio
+      display-name: RStudio
+      logo-url: 'fab fa-r-project'
+      container-image: shinystudio_rstudio_rshiny_vscode
+      container-cmd: ["/start.sh", "rstudio"]
+      container-network: shinystudio-net
+      container-volumes:
+        - "${MOUNTPOINT}/content/sites/${DESTSITE}:/home/${USER}/__ShinyStudio__:z"
+        - "${MOUNTPOINT}/settings/rstudio/${USER}/user-settings:/home/${USER}/.rstudio/monitored/user-settings:z"
+        - "${MOUNTPOINT}/content/users/${USER}:/home/${USER}/__Personal__:z"
+        - 'shinystudio_r_libraries:/r-libs'
+        - 'shinystudio_py_environment:/pyenv'
+        - 'shinystudio_pwsh_modules:/home/${USER}/.local/share/powershell/Modules'
+      container-env:
+        USER: "${USER}"
+        USERID: ${USERID}
+      description: Full Screen
+      port: 8787
+    - id: vscode
+      display-name: Visual Studio Code
+      logo-url: 'fas fa-terminal'
+      container-image: shinystudio_rstudio_rshiny_vscode
+      container-cmd: ["/start.sh", "vscode"]
+      container-network: shinystudio-net
+      container-volumes:
+        - "${MOUNTPOINT}/content/sites/${DESTSITE}:/home/${USER}/__ShinyStudio__:z"
+        - "${MOUNTPOINT}/content/users/${USER}:/home/${USER}/__Personal__:z"
+        - 'shinystudio_r_libraries:/r-libs'
+        - 'shinystudio_py_environment:/pyenv'
+        - 'shinystudio_pwsh_modules:/home/${USER}/.local/share/powershell/Modules'
+        - '${MOUNTPOINT}/settings/vscode/${USER}:/home/${USER}/.local/share/code-server:z'
+      container-env:
+        USER: "${USER}"
+        USERID: ${USERID}
+      description: Full Screen
+      port: 8443
