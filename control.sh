@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-MOUNTPOINT="/srv/shinystudio"
+MOUNTPOINT="${HOME}/shinystudio"
 
 if [ ! -z "$2" ]; then
     MOUNTPOINT="$2"
